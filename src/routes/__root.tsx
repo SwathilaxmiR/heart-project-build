@@ -11,6 +11,8 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { LanguageProvider } from "@/components/LanguageContext";
+import { AppShell } from "@/components/AppShell";
 
 function NotFoundComponent() {
   return (
@@ -77,14 +79,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "CivicPulse Coimbatore — Hyperlocal alerts for Kovai" },
+      { name: "description", content: "Power cuts, water cuts, road works and ward-level civic alerts for Coimbatore — aggregated from CCMC, TANGEDCO, news and community sources." },
+      { name: "author", content: "CivicPulse" },
+      { property: "og:title", content: "CivicPulse Coimbatore" },
+      { property: "og:description", content: "Hyperlocal civic alerts for Coimbatore — delivered before they affect you." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
@@ -118,8 +119,11 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <LanguageProvider>
+        <AppShell>
+          <Outlet />
+        </AppShell>
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }

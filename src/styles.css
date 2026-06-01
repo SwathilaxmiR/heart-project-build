@@ -46,6 +46,26 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-strong: var(--primary-strong);
+  --color-live: var(--live);
+  --color-warn: var(--warn);
+  --color-cat-politics-bg: var(--cat-politics-bg);
+  --color-cat-politics-fg: var(--cat-politics-fg);
+  --color-cat-crime-bg: var(--cat-crime-bg);
+  --color-cat-crime-fg: var(--cat-crime-fg);
+  --color-cat-weather-bg: var(--cat-weather-bg);
+  --color-cat-weather-fg: var(--cat-weather-fg);
+  --color-cat-traffic-bg: var(--cat-traffic-bg);
+  --color-cat-traffic-fg: var(--cat-traffic-fg);
+  --color-cat-business-bg: var(--cat-business-bg);
+  --color-cat-business-fg: var(--cat-business-fg);
+  --color-cat-civic-bg: var(--cat-civic-bg);
+  --color-cat-civic-fg: var(--cat-civic-fg);
+  --color-cat-health-bg: var(--cat-health-bg);
+  --color-cat-health-fg: var(--cat-health-fg);
+  --color-cat-sports-bg: var(--cat-sports-bg);
+  --color-cat-sports-fg: var(--cat-sports-fg);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -62,26 +82,48 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
+  --radius: 0.5rem;
+  /* CivicPulse brand: warm Coimbatore orange #D85A30 */
+  --background: oklch(0.995 0.003 60);
+  --foreground: oklch(0.22 0.02 40);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
+  --card-foreground: oklch(0.22 0.02 40);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
+  --popover-foreground: oklch(0.22 0.02 40);
+  --primary: oklch(0.63 0.16 38);            /* #D85A30 */
+  --primary-foreground: oklch(0.99 0.005 60);
+  --primary-soft: oklch(0.94 0.045 40);      /* #FAECE7 */
+  --primary-strong: oklch(0.42 0.13 38);     /* #993C1D */
+  --secondary: oklch(0.97 0.008 60);
+  --secondary-foreground: oklch(0.25 0.02 40);
+  --muted: oklch(0.965 0.006 60);
+  --muted-foreground: oklch(0.5 0.015 50);
+  --accent: oklch(0.94 0.045 40);
+  --accent-foreground: oklch(0.42 0.13 38);
   --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
+  --destructive-foreground: oklch(0.99 0.005 60);
+  --border: oklch(0.92 0.006 60);
+  --input: oklch(0.92 0.006 60);
+  --ring: oklch(0.63 0.16 38);
+  --live: oklch(0.62 0.13 160);              /* #1D9E75 */
+  --warn: oklch(0.72 0.15 70);
+  /* category accents */
+  --cat-politics-bg: oklch(0.95 0.03 280);
+  --cat-politics-fg: oklch(0.38 0.13 280);
+  --cat-crime-bg: oklch(0.95 0.035 25);
+  --cat-crime-fg: oklch(0.38 0.13 25);
+  --cat-weather-bg: oklch(0.94 0.035 240);
+  --cat-weather-fg: oklch(0.36 0.13 240);
+  --cat-traffic-bg: oklch(0.95 0.045 70);
+  --cat-traffic-fg: oklch(0.4 0.1 60);
+  --cat-business-bg: oklch(0.95 0.035 135);
+  --cat-business-fg: oklch(0.36 0.11 135);
+  --cat-civic-bg: oklch(0.94 0.045 40);
+  --cat-civic-fg: oklch(0.42 0.13 38);
+  --cat-health-bg: oklch(0.95 0.04 175);
+  --cat-health-fg: oklch(0.36 0.1 175);
+  --cat-sports-bg: oklch(0.95 0.03 280);
+  --cat-sports-fg: oklch(0.38 0.13 280);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -140,5 +182,13 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Inter", sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
+
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+  }
+  .pulse-dot { animation: pulse-soft 1.5s ease-in-out infinite; }
 }
