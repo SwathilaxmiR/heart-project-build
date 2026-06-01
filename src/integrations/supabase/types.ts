@@ -14,7 +14,108 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      alerts: {
+        Row: {
+          areas: string[]
+          category: string
+          created_at: string
+          end_time: string | null
+          id: string
+          lat: number | null
+          lng: number | null
+          severity: string
+          source: string
+          source_count: number
+          source_url: string | null
+          start_time: string | null
+          summary: string
+          summary_ta: string | null
+          title: string
+          title_ta: string | null
+          type: string
+          verified: boolean | null
+          ward: string | null
+        }
+        Insert: {
+          areas?: string[]
+          category?: string
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          severity?: string
+          source: string
+          source_count?: number
+          source_url?: string | null
+          start_time?: string | null
+          summary: string
+          summary_ta?: string | null
+          title: string
+          title_ta?: string | null
+          type: string
+          verified?: boolean | null
+          ward?: string | null
+        }
+        Update: {
+          areas?: string[]
+          category?: string
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          severity?: string
+          source?: string
+          source_count?: number
+          source_url?: string | null
+          start_time?: string | null
+          summary?: string
+          summary_ta?: string | null
+          title?: string
+          title_ta?: string | null
+          type?: string
+          verified?: boolean | null
+          ward?: string | null
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          active: boolean
+          alert_types: string[]
+          areas: string[]
+          channel: string
+          created_at: string
+          email: string | null
+          id: string
+          language: string
+          phone: string | null
+        }
+        Insert: {
+          active?: boolean
+          alert_types?: string[]
+          areas?: string[]
+          channel?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          language?: string
+          phone?: string | null
+        }
+        Update: {
+          active?: boolean
+          alert_types?: string[]
+          areas?: string[]
+          channel?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          language?: string
+          phone?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
