@@ -27,7 +27,10 @@ function SubscribePage() {
   const [types, setTypes] = useState<string[]>([]);
 
   const mutation = useMutation({
-    mutationFn: (data: Parameters<typeof sub>[0]["data"]) => sub({ data }),
+    mutationFn: (data: {
+      phone: string; email: string; areas: string[];
+      alert_types: string[]; channel: "whatsapp"|"email"|"both"; language: "en"|"ta";
+    }) => sub({ data }),
     onSuccess: () => {
       toast.success("Subscribed! You'll get alerts as soon as they're verified.");
       setPhone(""); setEmail(""); setAreas([]); setTypes([]);
