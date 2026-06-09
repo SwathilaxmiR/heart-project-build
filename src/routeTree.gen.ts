@@ -14,6 +14,9 @@ import { Route as SubscribeRouteImport } from './routes/subscribe'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiUpvoteRouteImport } from './routes/api/upvote'
+import { Route as ApiAlertsRouteImport } from './routes/api/alerts'
+import { Route as ApiPublicHooksScrapeRouteImport } from './routes/api/public/hooks/scrape'
 
 const WardRoute = WardRouteImport.update({
   id: '/ward',
@@ -40,6 +43,21 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiUpvoteRoute = ApiUpvoteRouteImport.update({
+  id: '/api/upvote',
+  path: '/api/upvote',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAlertsRoute = ApiAlertsRouteImport.update({
+  id: '/api/alerts',
+  path: '/api/alerts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicHooksScrapeRoute = ApiPublicHooksScrapeRouteImport.update({
+  id: '/api/public/hooks/scrape',
+  path: '/api/public/hooks/scrape',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +65,9 @@ export interface FileRoutesByFullPath {
   '/news': typeof NewsRoute
   '/subscribe': typeof SubscribeRoute
   '/ward': typeof WardRoute
+  '/api/alerts': typeof ApiAlertsRoute
+  '/api/upvote': typeof ApiUpvoteRoute
+  '/api/public/hooks/scrape': typeof ApiPublicHooksScrapeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +75,9 @@ export interface FileRoutesByTo {
   '/news': typeof NewsRoute
   '/subscribe': typeof SubscribeRoute
   '/ward': typeof WardRoute
+  '/api/alerts': typeof ApiAlertsRoute
+  '/api/upvote': typeof ApiUpvoteRoute
+  '/api/public/hooks/scrape': typeof ApiPublicHooksScrapeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +86,41 @@ export interface FileRoutesById {
   '/news': typeof NewsRoute
   '/subscribe': typeof SubscribeRoute
   '/ward': typeof WardRoute
+  '/api/alerts': typeof ApiAlertsRoute
+  '/api/upvote': typeof ApiUpvoteRoute
+  '/api/public/hooks/scrape': typeof ApiPublicHooksScrapeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/map' | '/news' | '/subscribe' | '/ward'
+  fullPaths:
+    | '/'
+    | '/map'
+    | '/news'
+    | '/subscribe'
+    | '/ward'
+    | '/api/alerts'
+    | '/api/upvote'
+    | '/api/public/hooks/scrape'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/map' | '/news' | '/subscribe' | '/ward'
-  id: '__root__' | '/' | '/map' | '/news' | '/subscribe' | '/ward'
+  to:
+    | '/'
+    | '/map'
+    | '/news'
+    | '/subscribe'
+    | '/ward'
+    | '/api/alerts'
+    | '/api/upvote'
+    | '/api/public/hooks/scrape'
+  id:
+    | '__root__'
+    | '/'
+    | '/map'
+    | '/news'
+    | '/subscribe'
+    | '/ward'
+    | '/api/alerts'
+    | '/api/upvote'
+    | '/api/public/hooks/scrape'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +129,9 @@ export interface RootRouteChildren {
   NewsRoute: typeof NewsRoute
   SubscribeRoute: typeof SubscribeRoute
   WardRoute: typeof WardRoute
+  ApiAlertsRoute: typeof ApiAlertsRoute
+  ApiUpvoteRoute: typeof ApiUpvoteRoute
+  ApiPublicHooksScrapeRoute: typeof ApiPublicHooksScrapeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -116,6 +171,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/upvote': {
+      id: '/api/upvote'
+      path: '/api/upvote'
+      fullPath: '/api/upvote'
+      preLoaderRoute: typeof ApiUpvoteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/alerts': {
+      id: '/api/alerts'
+      path: '/api/alerts'
+      fullPath: '/api/alerts'
+      preLoaderRoute: typeof ApiAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/scrape': {
+      id: '/api/public/hooks/scrape'
+      path: '/api/public/hooks/scrape'
+      fullPath: '/api/public/hooks/scrape'
+      preLoaderRoute: typeof ApiPublicHooksScrapeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -125,7 +201,20 @@ const rootRouteChildren: RootRouteChildren = {
   NewsRoute: NewsRoute,
   SubscribeRoute: SubscribeRoute,
   WardRoute: WardRoute,
+  ApiAlertsRoute: ApiAlertsRoute,
+  ApiUpvoteRoute: ApiUpvoteRoute,
+  ApiPublicHooksScrapeRoute: ApiPublicHooksScrapeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
