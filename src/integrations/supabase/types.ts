@@ -33,6 +33,7 @@ export type Database = {
           title: string
           title_ta: string | null
           type: string
+          upvotes: number
           verified: boolean | null
           ward: string | null
         }
@@ -54,6 +55,7 @@ export type Database = {
           title: string
           title_ta?: string | null
           type: string
+          upvotes?: number
           verified?: boolean | null
           ward?: string | null
         }
@@ -75,10 +77,82 @@ export type Database = {
           title?: string
           title_ta?: string | null
           type?: string
+          upvotes?: number
           verified?: boolean | null
           ward?: string | null
         }
         Relationships: []
+      }
+      news_articles: {
+        Row: {
+          category: string
+          created_at: string
+          duplicate_of: string | null
+          embedding: Json | null
+          id: string
+          is_duplicate: boolean
+          lang: string
+          normalized_title: string | null
+          published_at: string | null
+          source: string
+          source_url: string | null
+          source_urls: string[]
+          sources: string[]
+          summary: string
+          summary_en: string | null
+          title: string
+          title_en: string | null
+          upvotes: number
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          duplicate_of?: string | null
+          embedding?: Json | null
+          id?: string
+          is_duplicate?: boolean
+          lang?: string
+          normalized_title?: string | null
+          published_at?: string | null
+          source: string
+          source_url?: string | null
+          source_urls?: string[]
+          sources?: string[]
+          summary?: string
+          summary_en?: string | null
+          title: string
+          title_en?: string | null
+          upvotes?: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          duplicate_of?: string | null
+          embedding?: Json | null
+          id?: string
+          is_duplicate?: boolean
+          lang?: string
+          normalized_title?: string | null
+          published_at?: string | null
+          source?: string
+          source_url?: string | null
+          source_urls?: string[]
+          sources?: string[]
+          summary?: string
+          summary_en?: string | null
+          title?: string
+          title_en?: string | null
+          upvotes?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "news_articles_duplicate_of_fkey"
+            columns: ["duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "news_articles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscriptions: {
         Row: {
@@ -113,6 +187,30 @@ export type Database = {
           id?: string
           language?: string
           phone?: string | null
+        }
+        Relationships: []
+      }
+      upvote_log: {
+        Row: {
+          created_at: string
+          fingerprint: string
+          id: string
+          item_id: string
+          item_type: string
+        }
+        Insert: {
+          created_at?: string
+          fingerprint: string
+          id?: string
+          item_id: string
+          item_type: string
+        }
+        Update: {
+          created_at?: string
+          fingerprint?: string
+          id?: string
+          item_id?: string
+          item_type?: string
         }
         Relationships: []
       }
