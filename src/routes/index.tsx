@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useMemo, useEffect } from "react";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getAlerts } from "@/lib/civic.functions";
+import { getAlerts, type Alert } from "@/lib/civic.functions";
 import { AlertCard } from "@/components/AlertCard";
 import { BreakingBanner } from "@/components/BreakingBanner";
 import { CategorySidebar, RightSidebar } from "@/components/Sidebar";
+import { ALERT_TYPES, COIMBATORE_WARDS } from "@/lib/civic-data";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,62 +21,127 @@ export const Route = createFileRoute("/")({
   component: AlertsPage,
 });
 
+const PAGE_SIZE = 20;
+
 function AlertsPage() {
   const fetchAlerts = useServerFn(getAlerts);
-  const { data: alerts = [], isLoading } = useQuery({
-    queryKey: ["alerts"],
-    queryFn: () => fetchAlerts({ data: {} }),
-    refetchInterval: 60_000,
+  const [type, setType] = useState<string>("all");
+  const [area, setArea] = useState<string>("all");
+  const [sort, setSort] = useState<"latest" | "upvotes" | "breaking">("latest");
+  const [pages, setPages] = useState(1);
+
+  // reset pagination when filters change
+  useEffect(() => setPages(1), [type, area, sort]);
+
+  const queryKey = ["alerts", type, area, sort, pages] as const;
+  const { data, isLoading, isError, refetch, isFetching } = useQuery({
+    queryKey,
+    queryFn: () =>
+      fetchAlerts({
+        data: { type, area, sort, limit: PAGE_SIZE * pages, offset: 0 },
+      }),
+    refetchInterval: 5 * 60_000,
+    refetchOnWindowFocus: false,
+    placeholderData: keepPreviousData,
   });
-  const [category, setCategory] = useState("all");
-  const [sort, setSort] = useState<"latest" | "sources" | "breaking">("latest");
 
+  const items: Alert[] = data?.items ?? [];
+  const hasMore = data?.hasMore ?? false;
+
+  // Counts derived from current page (cheap; full counts would need separate query per category)
   const counts = useMemo(() => {
-    const c: Record<string, number> = { all: alerts.length };
-    for (const a of alerts) c[a.category] = (c[a.category] ?? 0) + 1;
+    const c: Record<string, number> = { all: data?.total ?? 0 };
+    for (const a of items) c[a.category] = (c[a.category] ?? 0) + 1;
     return c;
-  }, [alerts]);
+  }, [items, data?.total]);
 
-  const filtered = useMemo(() => {
-    let list = category === "all" ? alerts : alerts.filter((a) => a.category === category);
-    if (sort === "sources") list = [...list].sort((a, b) => b.source_count - a.source_count);
-    if (sort === "breaking") list = list.filter((a) => a.severity === "breaking" || a.severity === "high");
-    return list;
-  }, [alerts, category, sort]);
-
-  const breaking = alerts.find((a) => a.severity === "breaking");
+  const breaking = items.find((a) => a.severity === "breaking");
 
   return (
     <div className="grid md:grid-cols-[176px_1fr] lg:grid-cols-[176px_1fr_208px]">
-      <CategorySidebar active={category} counts={counts} onChange={setCategory} />
+      <CategorySidebar
+        active={type}
+        counts={counts}
+        onChange={(c) => setType(c)}
+      />
       <section className="flex flex-col min-w-0">
-        <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-secondary/60">
-          <span className="text-[12px] text-muted-foreground">Sort by:</span>
+        <div className="flex flex-wrap items-center gap-2 px-4 py-2 border-b border-border bg-secondary/60">
+          <span className="text-[12px] text-muted-foreground">Type:</span>
+          <select
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            className="text-[12px] px-1.5 py-0.5 border border-border rounded bg-card"
+          >
+            <option value="all">All types</option>
+            {ALERT_TYPES.map((t) => (
+              <option key={t.value} value={t.value}>{t.icon} {t.label}</option>
+            ))}
+          </select>
+          <span className="text-[12px] text-muted-foreground ml-2">Area:</span>
+          <select
+            value={area}
+            onChange={(e) => setArea(e.target.value)}
+            className="text-[12px] px-1.5 py-0.5 border border-border rounded bg-card max-w-[140px]"
+          >
+            <option value="all">All areas</option>
+            {COIMBATORE_WARDS.map((w) => (
+              <option key={w} value={w}>{w}</option>
+            ))}
+          </select>
+          <span className="text-[12px] text-muted-foreground ml-2">Sort:</span>
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as typeof sort)}
             className="text-[12px] px-1.5 py-0.5 border border-border rounded bg-card"
           >
             <option value="latest">Latest first</option>
-            <option value="sources">Most sources</option>
+            <option value="upvotes">Most upvoted</option>
             <option value="breaking">Breaking / high</option>
           </select>
           <span className="ml-auto text-[12px] text-muted-foreground">
-            Showing {filtered.length} of {alerts.length}
+            {isFetching && !isLoading ? "Refreshing… " : ""}Showing {items.length} of {data?.total ?? 0}
           </span>
         </div>
         <div className="p-3 md:p-4 flex flex-col gap-2.5">
-          {breaking && category === "all" && <BreakingBanner alert={breaking} />}
-          {isLoading && <p className="text-sm text-muted-foreground">Loading live alerts…</p>}
-          {!isLoading && filtered.length === 0 && (
-            <p className="text-sm text-muted-foreground py-6 text-center">No alerts in this category yet.</p>
+          {breaking && type === "all" && <BreakingBanner alert={breaking} />}
+          {isLoading && (
+            <>
+              {[0, 1, 2].map((i) => (
+                <Skeleton key={i} className="h-28 w-full" />
+              ))}
+            </>
           )}
-          {filtered.map((a, i) => (
-            <AlertCard key={a.id} alert={a} featured={i === 0 && category === "all"} />
+          {isError && (
+            <div className="text-center py-8 space-y-2">
+              <p className="text-sm text-muted-foreground">Couldn't load alerts.</p>
+              <button
+                onClick={() => refetch()}
+                className="text-[12px] px-3 py-1.5 rounded bg-primary text-primary-foreground"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+          {!isLoading && !isError && items.length === 0 && (
+            <p className="text-sm text-muted-foreground py-6 text-center">
+              No alerts for this area right now.
+            </p>
+          )}
+          {items.map((a, i) => (
+            <AlertCard key={a.id} alert={a} featured={i === 0 && type === "all"} />
           ))}
+          {hasMore && !isLoading && (
+            <button
+              onClick={() => setPages((p) => p + 1)}
+              disabled={isFetching}
+              className="mx-auto mt-2 text-[12px] px-4 py-2 rounded-md border border-border bg-card hover:bg-secondary disabled:opacity-50"
+            >
+              {isFetching ? "Loading…" : "Load more"}
+            </button>
+          )}
         </div>
       </section>
-      <RightSidebar alerts={alerts} />
+      <RightSidebar alerts={items} />
     </div>
   );
 }
