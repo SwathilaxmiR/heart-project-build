@@ -18,16 +18,13 @@ export const Route = createFileRoute("/ward")({
 
 function WardPage() {
   const fetchAlerts = useServerFn(getAlerts);
-  const { data: alerts = [] } = useQuery({
-    queryKey: ["alerts"],
-    queryFn: () => fetchAlerts({ data: {} }),
-  });
   const [ward, setWard] = useState<string>("Peelamedu");
-
-  const wardAlerts = useMemo(
-    () => alerts.filter((a) => a.areas.some((x) => x.toLowerCase() === ward.toLowerCase())),
-    [alerts, ward],
-  );
+  const { data } = useQuery({
+    queryKey: ["alerts", "ward", ward],
+    queryFn: () => fetchAlerts({ data: { area: ward, limit: 100 } }),
+    refetchInterval: 5 * 60_000,
+  });
+  const wardAlerts = data?.items ?? [];
 
   return (
     <div className="max-w-3xl mx-auto p-4 space-y-3">
