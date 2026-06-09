@@ -21,21 +21,41 @@ export type Alert = {
   lat: number | null;
   lng: number | null;
   created_at: string;
+  upvotes: number;
 };
 
+export type AlertsResponse = { items: Alert[]; total: number; hasMore: boolean };
+
 export const getAlerts = createServerFn({ method: "GET" })
-  .inputValidator((d: { category?: string; area?: string; limit?: number } | undefined) => d ?? {})
-  .handler(async ({ data }): Promise<Alert[]> => {
-    let q = supabaseAdmin
-      .from("alerts")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(data.limit ?? 50);
+  .inputValidator(
+    (d: {
+      type?: string;
+      category?: string;
+      area?: string;
+      limit?: number;
+      offset?: number;
+      sort?: "latest" | "upvotes" | "breaking";
+    } | undefined) => d ?? {},
+  )
+  .handler(async ({ data }): Promise<AlertsResponse> => {
+    const limit = Math.min(data.limit ?? 20, 100);
+    const offset = data.offset ?? 0;
+    let q = supabaseAdmin.from("alerts").select("*", { count: "exact" });
+    if (data.type && data.type !== "all") q = q.eq("type", data.type);
     if (data.category && data.category !== "all") q = q.eq("category", data.category);
-    if (data.area) q = q.contains("areas", [data.area]);
-    const { data: rows, error } = await q;
+    if (data.area && data.area !== "all") q = q.contains("areas", [data.area]);
+    if (data.sort === "upvotes") {
+      q = q.order("upvotes", { ascending: false }).order("created_at", { ascending: false });
+    } else if (data.sort === "breaking") {
+      q = q.in("severity", ["breaking", "high"]).order("created_at", { ascending: false });
+    } else {
+      q = q.order("created_at", { ascending: false });
+    }
+    q = q.range(offset, offset + limit - 1);
+    const { data: rows, count, error } = await q;
     if (error) throw new Error(error.message);
-    return (rows ?? []) as unknown as Alert[];
+    const items = (rows ?? []) as unknown as Alert[];
+    return { items, total: count ?? items.length, hasMore: offset + items.length < (count ?? 0) };
   });
 
 const SubscribeInput = z.object({
@@ -65,70 +85,77 @@ export const subscribe = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-// Aggregated news from public Coimbatore RSS feeds — server-side fetch so CORS isn't an issue.
-const FEEDS = [
-  { name: "The Hindu Coimbatore", lang: "en", url: "https://www.thehindu.com/news/cities/coimbatore/feeder/default.rss" },
-  { name: "Times of India Coimbatore", lang: "en", url: "https://timesofindia.indiatimes.com/rssfeeds/-2128931755.cms" },
-  { name: "New Indian Express TN", lang: "en", url: "https://www.newindianexpress.com/rss/india/tamilnadu.xml" },
-];
-
-export type NewsItem = {
+// === News (read from DB; populated by /api/public/hooks/scrape) ===
+export type NewsArticle = {
+  id: string;
   title: string;
-  link: string;
-  source: string;
-  lang: string;
-  published: string | null;
+  title_en: string | null;
   summary: string;
+  summary_en: string | null;
+  lang: string;
+  source: string;
+  source_url: string | null;
+  sources: string[];
+  source_urls: string[];
+  category: string;
+  published_at: string | null;
+  upvotes: number;
+  created_at: string;
 };
 
-function stripTags(s: string) {
-  return s.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
-}
-function pick(xml: string, tag: string): string | null {
-  const m = xml.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, "i"));
-  if (!m) return null;
-  return stripTags(m[1].replace(/<!\[CDATA\[|\]\]>/g, ""));
-}
-
-export const getNews = createServerFn({ method: "GET" }).handler(async (): Promise<NewsItem[]> => {
-  const all: NewsItem[] = [];
-  await Promise.all(
-    FEEDS.map(async (f) => {
-      try {
-        const res = await fetch(f.url, {
-          headers: { "User-Agent": "CivicPulseCoimbatore/1.0" },
-          signal: AbortSignal.timeout(8000),
-        });
-        if (!res.ok) return;
-        const xml = await res.text();
-        const items = xml.split(/<item[\s>]/i).slice(1, 16);
-        for (const raw of items) {
-          const chunk = "<item " + raw.split(/<\/item>/i)[0] + "</item>";
-          const title = pick(chunk, "title") ?? "";
-          if (!title) continue;
-          const link = pick(chunk, "link") ?? "";
-          const desc = pick(chunk, "description") ?? "";
-          const pub = pick(chunk, "pubDate");
-          // Coimbatore filter for the TN-wide feed
-          if (f.url.includes("tamilnadu") && !/coimba|kovai|coimbatore/i.test(title + " " + desc)) continue;
-          all.push({
-            title,
-            link,
-            source: f.name,
-            lang: f.lang,
-            published: pub,
-            summary: desc.slice(0, 240),
-          });
-        }
-      } catch {
-        /* feed failure is non-fatal */
-      }
-    }),
-  );
-  all.sort((a, b) => {
-    const ad = a.published ? Date.parse(a.published) : 0;
-    const bd = b.published ? Date.parse(b.published) : 0;
-    return bd - ad;
+export const getNews = createServerFn({ method: "GET" })
+  .inputValidator(
+    (d: { sort?: "latest" | "upvotes"; limit?: number; offset?: number } | undefined) => d ?? {},
+  )
+  .handler(async ({ data }): Promise<NewsArticle[]> => {
+    const limit = Math.min(data.limit ?? 40, 100);
+    const offset = data.offset ?? 0;
+    let q = supabaseAdmin.from("news_articles").select("*").eq("is_duplicate", false);
+    if (data.sort === "upvotes") {
+      q = q.order("upvotes", { ascending: false }).order("published_at", { ascending: false });
+    } else {
+      // Multi-source articles bubble up slightly (more confirmed)
+      q = q.order("published_at", { ascending: false });
+    }
+    q = q.range(offset, offset + limit - 1);
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+    const items = (rows ?? []) as unknown as NewsArticle[];
+    // Boost multi-source items by a small amount when sorting by latest
+    if (data.sort !== "upvotes") {
+      items.sort((a, b) => {
+        const sa = a.sources?.length ?? 1;
+        const sb = b.sources?.length ?? 1;
+        if (sa !== sb && (sa > 1 || sb > 1)) return sb - sa;
+        return (b.published_at ?? b.created_at).localeCompare(a.published_at ?? a.created_at);
+      });
+    }
+    return items;
   });
-  return all.slice(0, 30);
+
+// === Upvotes ===
+const UpvoteInput = z.object({
+  item_id: z.string().uuid(),
+  item_type: z.enum(["alert", "news"]),
+  fingerprint: z.string().min(8).max(200),
 });
+
+export const upvote = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => UpvoteInput.parse(d))
+  .handler(async ({ data }): Promise<{ already_voted: boolean; upvotes: number }> => {
+    const table = data.item_type === "alert" ? "alerts" : "news_articles";
+    // Try to insert into log; unique constraint blocks duplicates
+    const { error: logErr } = await supabaseAdmin
+      .from("upvote_log")
+      .insert({ item_id: data.item_id, item_type: data.item_type, fingerprint: data.fingerprint });
+    if (logErr) {
+      // Duplicate vote — fetch current count
+      const { data: row } = await supabaseAdmin.from(table).select("upvotes").eq("id", data.item_id).single();
+      return { already_voted: true, upvotes: row?.upvotes ?? 0 };
+    }
+    // Increment count
+    const { data: cur } = await supabaseAdmin.from(table).select("upvotes").eq("id", data.item_id).single();
+    const next = (cur?.upvotes ?? 0) + 1;
+    await supabaseAdmin.from(table).update({ upvotes: next }).eq("id", data.item_id);
+    return { already_voted: false, upvotes: next };
+  });
