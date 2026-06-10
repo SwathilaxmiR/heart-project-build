@@ -4,7 +4,7 @@ import { useLang } from "./LanguageContext";
 
 const tabs = [
   { to: "/", label: { en: "Alerts", ta: "எச்சரிக்கைகள்" }, icon: Bell },
-  { to: "/news", label: { en: "Kovai Today", ta: "கோவை இன்று" }, icon: Newspaper },
+  { to: "/news", label: { en: "KovaiToday", ta: "கோவை இன்று" }, icon: Newspaper },
   { to: "/map", label: { en: "Map", ta: "வரைபடம்" }, icon: MapIcon },
   { to: "/ward", label: { en: "My Ward", ta: "என் வார்டு" }, icon: Building2 },
   { to: "/subscribe", label: { en: "Subscribe", ta: "சந்தா" }, icon: Smartphone },
@@ -18,8 +18,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <header className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-card sticky top-0 z-30">
         <div className="flex items-center gap-3">
           <div className="text-[15px] font-medium">
-            Civic<span className="text-primary">Pulse</span>
-            <span className="text-muted-foreground"> · Coimbatore</span>
+            Kovai<span className="text-primary">Today</span>
           </div>
           <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-muted-foreground">
             <span className="w-1.5 h-1.5 rounded-full bg-live pulse-dot" />
@@ -67,7 +66,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <main className="flex-1">{children}</main>
 
       <footer className="px-4 py-3 border-t border-border text-[11px] text-muted-foreground text-center">
-        CivicPulse Coimbatore · Aggregating CCMC, TANGEDCO, news & community sources
+        KovaiToday · Aggregating CCMC, TANGEDCO, news & community sources
       </footer>
     </div>
   );
