@@ -14,60 +14,51 @@ export function AlertCard({ alert, featured = false }: { alert: Alert; featured?
       : alert.severity === "medium"
         ? "bg-warn/10 text-warn"
         : "bg-muted text-muted-foreground";
-  const typeIcon: Record<string, string> = {
-    power_cut: "⚡",
-    water_cut: "💧",
-    road_work: "🚧",
-    flooding: "🌊",
-    traffic: "🚦",
-    weather: "🌧️",
-  };
   return (
     <article
       className={`bg-card border border-border rounded-lg p-3 hover:border-foreground/20 transition-colors ${
         featured ? "border-l-2 border-l-primary" : ""
       }`}
     >
-      <div className="flex items-center gap-2 mb-1.5">
-        <span className="text-base leading-none">{typeIcon[alert.type] ?? "📌"}</span>
+      <div className="flex items-center gap-2 mb-1.5 text-[11px] text-muted-foreground">
         <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded uppercase tracking-wide ${categoryClass(alert.category)}`}>
           {alert.category}
         </span>
         <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded uppercase ${sevColor}`}>
           {alert.severity}
         </span>
-        <span className="text-[11px] text-muted-foreground">{alert.source}</span>
-        <span className="text-[11px] text-muted-foreground ml-auto">
-          {timeAgo(alert.created_at)}
-        </span>
+        <span className="font-medium text-foreground/80">{alert.source}</span>
+        <span>·</span>
+        <span>{timeAgo(alert.created_at)}</span>
+        <span className="ml-auto" />
+        <UpvoteButton itemId={alert.id} itemType="alert" count={alert.upvotes ?? 0} />
       </div>
       <h3 className="text-[13px] font-medium leading-snug mb-1">{title}</h3>
-      <p className="text-[12px] text-muted-foreground leading-relaxed mb-2">{summary}</p>
+      {summary && <p className="text-[12px] text-muted-foreground leading-relaxed line-clamp-2 mb-2">{summary}</p>}
       {(alert.start_time || alert.end_time) && (
         <div className="text-[11px] text-muted-foreground mb-2">
           {alert.start_time && <>From {new Date(alert.start_time).toLocaleString()}</>}
           {alert.end_time && <> · until {new Date(alert.end_time).toLocaleString()}</>}
         </div>
       )}
-      <div className="flex items-center gap-1.5 flex-wrap">
-        {alert.areas.slice(0, 3).map((a) => (
-          <span
-            key={a}
-            className="text-[11px] bg-secondary text-muted-foreground px-1.5 py-0.5 rounded flex items-center gap-1"
-          >
-            <MapPin className="w-2.5 h-2.5" />
-            {a}
-          </span>
-        ))}
-        <div className="ml-auto flex items-center gap-2">
+      {alert.areas.length > 0 && (
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {alert.areas.slice(0, 3).map((a) => (
+            <span
+              key={a}
+              className="text-[11px] bg-secondary text-muted-foreground px-1.5 py-0.5 rounded flex items-center gap-1"
+            >
+              <MapPin className="w-2.5 h-2.5" />
+              {a}
+            </span>
+          ))}
           {alert.source_count > 1 && (
-            <span className="text-[11px] text-muted-foreground">
+            <span className="ml-auto text-[11px] text-muted-foreground">
               +{alert.source_count - 1} source{alert.source_count > 2 ? "s" : ""}
             </span>
           )}
-          <UpvoteButton itemId={alert.id} itemType="alert" count={alert.upvotes ?? 0} />
         </div>
-      </div>
+      )}
     </article>
   );
 }
