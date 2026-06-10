@@ -10,9 +10,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const Route = createFileRoute("/news")({
   head: () => ({
     meta: [
-      { title: "Kovai Today — Coimbatore news aggregator" },
+      { title: "KovaiToday — Coimbatore news aggregator" },
       { name: "description", content: "Coimbatore news from The Hindu, Times of India, New Indian Express and more — deduplicated and updated every 15 minutes." },
-      { property: "og:title", content: "Kovai Today — Coimbatore news aggregator" },
+      { property: "og:title", content: "KovaiToday — Coimbatore news aggregator" },
       { property: "og:description", content: "All Coimbatore news in one feed." },
     ],
   }),
@@ -32,7 +32,7 @@ function NewsPage() {
     <div className="max-w-3xl mx-auto p-4 space-y-2.5">
       <header className="mb-2 flex items-end gap-3">
         <div className="flex-1">
-          <h1 className="text-lg font-medium">Kovai Today</h1>
+          <h1 className="text-lg font-medium">KovaiToday</h1>
           <p className="text-[12px] text-muted-foreground">
             Deduplicated Coimbatore news · updated every 15 min{isFetching && !isLoading ? " · refreshing…" : ""}
           </p>
