@@ -25,20 +25,21 @@ const PAGE_SIZE = 20;
 
 function AlertsPage() {
   const fetchAlerts = useServerFn(getAlerts);
+  const [category, setCategory] = useState<string>("all");
   const [type, setType] = useState<string>("all");
   const [area, setArea] = useState<string>("all");
   const [sort, setSort] = useState<"latest" | "upvotes" | "breaking">("latest");
   const [pages, setPages] = useState(1);
 
   // reset pagination when filters change
-  useEffect(() => setPages(1), [type, area, sort]);
+  useEffect(() => setPages(1), [category, type, area, sort]);
 
-  const queryKey = ["alerts", type, area, sort, pages] as const;
+  const queryKey = ["alerts", category, type, area, sort, pages] as const;
   const { data, isLoading, isError, refetch, isFetching } = useQuery({
     queryKey,
     queryFn: () =>
       fetchAlerts({
-        data: { type, area, sort, limit: PAGE_SIZE * pages, offset: 0 },
+        data: { category, type, area, sort, limit: PAGE_SIZE * pages, offset: 0 },
       }),
     refetchInterval: 5 * 60_000,
     refetchOnWindowFocus: false,
@@ -48,21 +49,26 @@ function AlertsPage() {
   const items: Alert[] = data?.items ?? [];
   const hasMore = data?.hasMore ?? false;
 
-  // Counts derived from current page (cheap; full counts would need separate query per category)
+  // Counts per category — fetch once (unfiltered) so chips always show totals
+  const { data: allData } = useQuery({
+    queryKey: ["alerts-counts"],
+    queryFn: () => fetchAlerts({ data: { limit: 100, offset: 0 } }),
+    refetchInterval: 5 * 60_000,
+  });
   const counts = useMemo(() => {
-    const c: Record<string, number> = { all: data?.total ?? 0 };
-    for (const a of items) c[a.category] = (c[a.category] ?? 0) + 1;
+    const c: Record<string, number> = { all: allData?.total ?? 0 };
+    for (const a of allData?.items ?? []) c[a.category] = (c[a.category] ?? 0) + 1;
     return c;
-  }, [items, data?.total]);
+  }, [allData]);
 
   const breaking = items.find((a) => a.severity === "breaking");
 
   return (
     <div className="grid md:grid-cols-[176px_1fr] lg:grid-cols-[176px_1fr_208px]">
       <CategorySidebar
-        active={type}
+        active={category}
         counts={counts}
-        onChange={(c) => setType(c)}
+        onChange={(c) => setCategory(c)}
       />
       <section className="flex flex-col min-w-0">
         <div className="flex flex-wrap items-center gap-2 px-4 py-2 border-b border-border bg-secondary/60">
@@ -103,7 +109,7 @@ function AlertsPage() {
           </span>
         </div>
         <div className="p-3 md:p-4 flex flex-col gap-2.5">
-          {breaking && type === "all" && <BreakingBanner alert={breaking} />}
+          {breaking && category === "all" && type === "all" && <BreakingBanner alert={breaking} />}
           {isLoading && (
             <>
               {[0, 1, 2].map((i) => (
@@ -128,7 +134,7 @@ function AlertsPage() {
             </p>
           )}
           {items.map((a, i) => (
-            <AlertCard key={a.id} alert={a} featured={i === 0 && type === "all"} />
+            <AlertCard key={a.id} alert={a} featured={i === 0 && category === "all"} />
           ))}
           {hasMore && !isLoading && (
             <button

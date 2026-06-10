@@ -79,10 +79,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "CivicPulse Coimbatore — Hyperlocal alerts for Kovai" },
+      { title: "KovaiToday — Hyperlocal alerts for Kovai" },
       { name: "description", content: "Power cuts, water cuts, road works and ward-level civic alerts for Coimbatore — aggregated from CCMC, TANGEDCO, news and community sources." },
-      { name: "author", content: "CivicPulse" },
-      { property: "og:title", content: "CivicPulse Coimbatore" },
+      { name: "author", content: "KovaiToday" },
+      { property: "og:title", content: "KovaiToday" },
       { property: "og:description", content: "Hyperlocal civic alerts for Coimbatore — delivered before they affect you." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

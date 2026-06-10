@@ -1,6 +1,6 @@
-import { Sun, CloudRain } from "lucide-react";
 import { CATEGORIES } from "@/lib/civic-data";
 import type { Alert } from "@/lib/civic.functions";
+import { Weather } from "./Weather";
 
 export function CategorySidebar({
   active,
@@ -48,17 +48,7 @@ export function RightSidebar({ alerts }: { alerts: Alert[] }) {
         <h4 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-2">
           Coimbatore weather
         </h4>
-        <div className="bg-secondary rounded-md p-2.5 text-center">
-          <Sun className="w-5 h-5 mx-auto text-warn mb-1" />
-          <div className="text-[22px] font-medium">35°C</div>
-          <div className="text-[11px] text-muted-foreground">Partly cloudy · Rain Friday</div>
-          <div className="flex justify-between text-[11px] text-muted-foreground mt-2">
-            <span>H: 37°</span><span>L: 26°</span><span>62%</span>
-          </div>
-          <div className="flex items-center justify-center gap-1 text-[11px] text-cat-weather-fg mt-2">
-            <CloudRain className="w-3 h-3" /> Yellow alert
-          </div>
-        </div>
+        <Weather />
       </section>
       <section>
         <h4 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-2">
