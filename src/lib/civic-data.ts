@@ -19,16 +19,16 @@ export const ALERT_TYPES = [
   { value: "civic", label: "Civic notices", icon: "🏛️" },
 ];
 
-export const CATEGORIES = [
-  { value: "all", label: "All news", icon: "▤" },
-  { value: "civic", label: "Civic", icon: "⚡" },
-  { value: "politics", label: "Politics", icon: "🏛" },
-  { value: "crime", label: "Crime", icon: "🛡" },
-  { value: "traffic", label: "Traffic", icon: "🚧" },
-  { value: "business", label: "Business", icon: "💼" },
-  { value: "weather", label: "Weather", icon: "🌧" },
-  { value: "health", label: "Health", icon: "🏥" },
-  { value: "sports", label: "Sports", icon: "🏏" },
+export const CATEGORIES: { value: string; label: string; ta: string; icon: string; key: string }[] = [
+  { value: "all", label: "All news", ta: "அனைத்தும்", icon: "▤", key: "cat_all" },
+  { value: "civic", label: "Civic", ta: "உள்ளாட்சி", icon: "⚡", key: "cat_civic" },
+  { value: "politics", label: "Politics", ta: "அரசியல்", icon: "🏛", key: "cat_politics" },
+  { value: "crime", label: "Crime", ta: "குற்றம்", icon: "🛡", key: "cat_crime" },
+  { value: "traffic", label: "Traffic", ta: "போக்குவரத்து", icon: "🚧", key: "cat_traffic" },
+  { value: "business", label: "Business", ta: "வணிகம்", icon: "💼", key: "cat_business" },
+  { value: "weather", label: "Weather", ta: "வானிலை", icon: "🌧", key: "cat_weather" },
+  { value: "health", label: "Health", ta: "சுகாதாரம்", icon: "🏥", key: "cat_health" },
+  { value: "sports", label: "Sports", ta: "விளையாட்டு", icon: "🏏", key: "cat_sports" },
 ];
 
 export function timeAgo(iso: string | null | undefined): string {

@@ -9,40 +9,10 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WardRouteImport } from './routes/ward'
-import { Route as SubscribeRouteImport } from './routes/subscribe'
-import { Route as NewsRouteImport } from './routes/news'
-import { Route as MapRouteImport } from './routes/map'
-import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiUpvoteRouteImport } from './routes/api/upvote'
 import { Route as ApiAlertsRouteImport } from './routes/api/alerts'
 import { Route as ApiPublicHooksScrapeRouteImport } from './routes/api/public/hooks/scrape'
 
-const WardRoute = WardRouteImport.update({
-  id: '/ward',
-  path: '/ward',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SubscribeRoute = SubscribeRouteImport.update({
-  id: '/subscribe',
-  path: '/subscribe',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NewsRoute = NewsRouteImport.update({
-  id: '/news',
-  path: '/news',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MapRoute = MapRouteImport.update({
-  id: '/map',
-  path: '/map',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiUpvoteRoute = ApiUpvoteRouteImport.update({
   id: '/api/upvote',
   path: '/api/upvote',
@@ -60,75 +30,30 @@ const ApiPublicHooksScrapeRoute = ApiPublicHooksScrapeRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/map': typeof MapRoute
-  '/news': typeof NewsRoute
-  '/subscribe': typeof SubscribeRoute
-  '/ward': typeof WardRoute
   '/api/alerts': typeof ApiAlertsRoute
   '/api/upvote': typeof ApiUpvoteRoute
   '/api/public/hooks/scrape': typeof ApiPublicHooksScrapeRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/map': typeof MapRoute
-  '/news': typeof NewsRoute
-  '/subscribe': typeof SubscribeRoute
-  '/ward': typeof WardRoute
   '/api/alerts': typeof ApiAlertsRoute
   '/api/upvote': typeof ApiUpvoteRoute
   '/api/public/hooks/scrape': typeof ApiPublicHooksScrapeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/map': typeof MapRoute
-  '/news': typeof NewsRoute
-  '/subscribe': typeof SubscribeRoute
-  '/ward': typeof WardRoute
   '/api/alerts': typeof ApiAlertsRoute
   '/api/upvote': typeof ApiUpvoteRoute
   '/api/public/hooks/scrape': typeof ApiPublicHooksScrapeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/map'
-    | '/news'
-    | '/subscribe'
-    | '/ward'
-    | '/api/alerts'
-    | '/api/upvote'
-    | '/api/public/hooks/scrape'
+  fullPaths: '/api/alerts' | '/api/upvote' | '/api/public/hooks/scrape'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/map'
-    | '/news'
-    | '/subscribe'
-    | '/ward'
-    | '/api/alerts'
-    | '/api/upvote'
-    | '/api/public/hooks/scrape'
-  id:
-    | '__root__'
-    | '/'
-    | '/map'
-    | '/news'
-    | '/subscribe'
-    | '/ward'
-    | '/api/alerts'
-    | '/api/upvote'
-    | '/api/public/hooks/scrape'
+  to: '/api/alerts' | '/api/upvote' | '/api/public/hooks/scrape'
+  id: '__root__' | '/api/alerts' | '/api/upvote' | '/api/public/hooks/scrape'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  MapRoute: typeof MapRoute
-  NewsRoute: typeof NewsRoute
-  SubscribeRoute: typeof SubscribeRoute
-  WardRoute: typeof WardRoute
   ApiAlertsRoute: typeof ApiAlertsRoute
   ApiUpvoteRoute: typeof ApiUpvoteRoute
   ApiPublicHooksScrapeRoute: typeof ApiPublicHooksScrapeRoute
@@ -136,41 +61,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/ward': {
-      id: '/ward'
-      path: '/ward'
-      fullPath: '/ward'
-      preLoaderRoute: typeof WardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/subscribe': {
-      id: '/subscribe'
-      path: '/subscribe'
-      fullPath: '/subscribe'
-      preLoaderRoute: typeof SubscribeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/news': {
-      id: '/news'
-      path: '/news'
-      fullPath: '/news'
-      preLoaderRoute: typeof NewsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/map': {
-      id: '/map'
-      path: '/map'
-      fullPath: '/map'
-      preLoaderRoute: typeof MapRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/upvote': {
       id: '/api/upvote'
       path: '/api/upvote'
@@ -196,11 +86,6 @@ declare module '@tanstack/react-router' {
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  MapRoute: MapRoute,
-  NewsRoute: NewsRoute,
-  SubscribeRoute: SubscribeRoute,
-  WardRoute: WardRoute,
   ApiAlertsRoute: ApiAlertsRoute,
   ApiUpvoteRoute: ApiUpvoteRoute,
   ApiPublicHooksScrapeRoute: ApiPublicHooksScrapeRoute,

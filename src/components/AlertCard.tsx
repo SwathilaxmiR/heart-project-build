@@ -1,10 +1,10 @@
-import { MapPin } from "lucide-react";
+import { MapPin, ExternalLink } from "lucide-react";
 import { categoryClass, timeAgo } from "@/lib/civic-data";
 import { useLang } from "./LanguageContext";
 import type { Alert } from "@/lib/civic.functions";
 import { UpvoteButton } from "./UpvoteButton";
 
-export function AlertCard({ alert, featured = false }: { alert: Alert; featured?: boolean }) {
+export function AlertCard({ alert }: { alert: Alert; featured?: boolean }) {
   const { lang } = useLang();
   const title = lang === "ta" && alert.title_ta ? alert.title_ta : alert.title;
   const summary = lang === "ta" && alert.summary_ta ? alert.summary_ta : alert.summary;
@@ -15,11 +15,7 @@ export function AlertCard({ alert, featured = false }: { alert: Alert; featured?
         ? "bg-warn/10 text-warn"
         : "bg-muted text-muted-foreground";
   return (
-    <article
-      className={`bg-card border border-border rounded-lg p-3 hover:border-foreground/20 transition-colors ${
-        featured ? "border-l-2 border-l-primary" : ""
-      }`}
-    >
+    <article className="bg-card border border-border rounded-lg p-3 hover:border-foreground/40 hover:shadow-sm transition-colors">
       <div className="flex items-center gap-2 mb-1.5 text-[11px] text-muted-foreground">
         <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded uppercase tracking-wide ${categoryClass(alert.category)}`}>
           {alert.category}
@@ -33,8 +29,25 @@ export function AlertCard({ alert, featured = false }: { alert: Alert; featured?
         <span className="ml-auto" />
         <UpvoteButton itemId={alert.id} itemType="alert" count={alert.upvotes ?? 0} />
       </div>
-      <h3 className="text-[13px] font-medium leading-snug mb-1">{title}</h3>
-      {summary && <p className="text-[12px] text-muted-foreground leading-relaxed line-clamp-2 mb-2">{summary}</p>}
+      {alert.source_url ? (
+        <a
+          href={alert.source_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block group"
+        >
+          <h3 className="text-[13px] font-medium leading-snug mb-1 group-hover:text-primary inline-flex items-baseline gap-1">
+            {title}
+            <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100 translate-y-[1px]" />
+          </h3>
+          {summary && <p className="text-[12px] text-muted-foreground leading-relaxed line-clamp-2 mb-2">{summary}</p>}
+        </a>
+      ) : (
+        <>
+          <h3 className="text-[13px] font-medium leading-snug mb-1">{title}</h3>
+          {summary && <p className="text-[12px] text-muted-foreground leading-relaxed line-clamp-2 mb-2">{summary}</p>}
+        </>
+      )}
       {(alert.start_time || alert.end_time) && (
         <div className="text-[11px] text-muted-foreground mb-2">
           {alert.start_time && <>From {new Date(alert.start_time).toLocaleString()}</>}

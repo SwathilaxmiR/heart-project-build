@@ -1,6 +1,7 @@
 import { CATEGORIES } from "@/lib/civic-data";
 import type { Alert } from "@/lib/civic.functions";
 import { Weather } from "./Weather";
+import { useLang } from "./LanguageContext";
 
 export function CategorySidebar({
   active,
@@ -11,6 +12,7 @@ export function CategorySidebar({
   counts: Record<string, number>;
   onChange: (cat: string) => void;
 }) {
+  const { lang } = useLang();
   return (
     <aside className="md:w-44 md:border-r border-border bg-card md:py-3 md:sticky md:top-[91px] md:self-start">
       <div className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible px-2 md:px-0 py-2 md:py-0">
@@ -27,7 +29,7 @@ export function CategorySidebar({
               }`}
             >
               <span className="text-[14px] w-4 text-center">{c.icon}</span>
-              <span>{c.label}</span>
+              <span>{lang === "ta" ? c.ta : c.label}</span>
               <span className="ml-auto text-[11px] bg-secondary px-1.5 py-0.5 rounded-md text-muted-foreground">
                 {counts[c.value] ?? 0}
               </span>
@@ -40,19 +42,20 @@ export function CategorySidebar({
 }
 
 export function RightSidebar({ alerts }: { alerts: Alert[] }) {
+  const { t } = useLang();
   const sources = Array.from(new Set(alerts.map((a) => a.source))).slice(0, 6);
   const trending = alerts.slice(0, 5);
   return (
     <aside className="hidden lg:block w-52 border-l border-border p-3 space-y-4 sticky top-[91px] self-start">
       <section>
         <h4 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-2">
-          Coimbatore weather
+          {t("weather")}
         </h4>
         <Weather />
       </section>
       <section>
         <h4 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-2">
-          Trending in Kovai
+          {t("trending")}
         </h4>
         <ol className="space-y-1.5">
           {trending.map((t, i) => (
@@ -65,7 +68,7 @@ export function RightSidebar({ alerts }: { alerts: Alert[] }) {
       </section>
       <section>
         <h4 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-2">
-          Sources active now
+          {t("sources_active")}
         </h4>
         <div className="space-y-1.5">
           {sources.map((s) => (
