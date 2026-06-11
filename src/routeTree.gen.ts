@@ -9,10 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiUpvoteRouteImport } from './routes/api/upvote'
 import { Route as ApiAlertsRouteImport } from './routes/api/alerts'
+import { Route as AuthenticatedWardRouteImport } from './routes/_authenticated/ward'
+import { Route as AuthenticatedSubscribeRouteImport } from './routes/_authenticated/subscribe'
+import { Route as AuthenticatedNewsRouteImport } from './routes/_authenticated/news'
+import { Route as AuthenticatedMapRouteImport } from './routes/_authenticated/map'
+import { Route as AuthenticatedAlertsRouteImport } from './routes/_authenticated/alerts'
 import { Route as ApiPublicHooksScrapeRouteImport } from './routes/api/public/hooks/scrape'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiUpvoteRoute = ApiUpvoteRouteImport.update({
   id: '/api/upvote',
   path: '/api/upvote',
@@ -23,6 +45,31 @@ const ApiAlertsRoute = ApiAlertsRouteImport.update({
   path: '/api/alerts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedWardRoute = AuthenticatedWardRouteImport.update({
+  id: '/ward',
+  path: '/ward',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSubscribeRoute = AuthenticatedSubscribeRouteImport.update({
+  id: '/subscribe',
+  path: '/subscribe',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedNewsRoute = AuthenticatedNewsRouteImport.update({
+  id: '/news',
+  path: '/news',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMapRoute = AuthenticatedMapRouteImport.update({
+  id: '/map',
+  path: '/map',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAlertsRoute = AuthenticatedAlertsRouteImport.update({
+  id: '/alerts',
+  path: '/alerts',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ApiPublicHooksScrapeRoute = ApiPublicHooksScrapeRouteImport.update({
   id: '/api/public/hooks/scrape',
   path: '/api/public/hooks/scrape',
@@ -30,30 +77,87 @@ const ApiPublicHooksScrapeRoute = ApiPublicHooksScrapeRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/alerts': typeof AuthenticatedAlertsRoute
+  '/map': typeof AuthenticatedMapRoute
+  '/news': typeof AuthenticatedNewsRoute
+  '/subscribe': typeof AuthenticatedSubscribeRoute
+  '/ward': typeof AuthenticatedWardRoute
   '/api/alerts': typeof ApiAlertsRoute
   '/api/upvote': typeof ApiUpvoteRoute
   '/api/public/hooks/scrape': typeof ApiPublicHooksScrapeRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/alerts': typeof AuthenticatedAlertsRoute
+  '/map': typeof AuthenticatedMapRoute
+  '/news': typeof AuthenticatedNewsRoute
+  '/subscribe': typeof AuthenticatedSubscribeRoute
+  '/ward': typeof AuthenticatedWardRoute
   '/api/alerts': typeof ApiAlertsRoute
   '/api/upvote': typeof ApiUpvoteRoute
   '/api/public/hooks/scrape': typeof ApiPublicHooksScrapeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/alerts': typeof AuthenticatedAlertsRoute
+  '/_authenticated/map': typeof AuthenticatedMapRoute
+  '/_authenticated/news': typeof AuthenticatedNewsRoute
+  '/_authenticated/subscribe': typeof AuthenticatedSubscribeRoute
+  '/_authenticated/ward': typeof AuthenticatedWardRoute
   '/api/alerts': typeof ApiAlertsRoute
   '/api/upvote': typeof ApiUpvoteRoute
   '/api/public/hooks/scrape': typeof ApiPublicHooksScrapeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/api/alerts' | '/api/upvote' | '/api/public/hooks/scrape'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/alerts'
+    | '/map'
+    | '/news'
+    | '/subscribe'
+    | '/ward'
+    | '/api/alerts'
+    | '/api/upvote'
+    | '/api/public/hooks/scrape'
   fileRoutesByTo: FileRoutesByTo
-  to: '/api/alerts' | '/api/upvote' | '/api/public/hooks/scrape'
-  id: '__root__' | '/api/alerts' | '/api/upvote' | '/api/public/hooks/scrape'
+  to:
+    | '/'
+    | '/auth'
+    | '/alerts'
+    | '/map'
+    | '/news'
+    | '/subscribe'
+    | '/ward'
+    | '/api/alerts'
+    | '/api/upvote'
+    | '/api/public/hooks/scrape'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/alerts'
+    | '/_authenticated/map'
+    | '/_authenticated/news'
+    | '/_authenticated/subscribe'
+    | '/_authenticated/ward'
+    | '/api/alerts'
+    | '/api/upvote'
+    | '/api/public/hooks/scrape'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   ApiAlertsRoute: typeof ApiAlertsRoute
   ApiUpvoteRoute: typeof ApiUpvoteRoute
   ApiPublicHooksScrapeRoute: typeof ApiPublicHooksScrapeRoute
@@ -61,6 +165,27 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/upvote': {
       id: '/api/upvote'
       path: '/api/upvote'
@@ -75,6 +200,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAlertsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/ward': {
+      id: '/_authenticated/ward'
+      path: '/ward'
+      fullPath: '/ward'
+      preLoaderRoute: typeof AuthenticatedWardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/subscribe': {
+      id: '/_authenticated/subscribe'
+      path: '/subscribe'
+      fullPath: '/subscribe'
+      preLoaderRoute: typeof AuthenticatedSubscribeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/news': {
+      id: '/_authenticated/news'
+      path: '/news'
+      fullPath: '/news'
+      preLoaderRoute: typeof AuthenticatedNewsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/map': {
+      id: '/_authenticated/map'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof AuthenticatedMapRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/alerts': {
+      id: '/_authenticated/alerts'
+      path: '/alerts'
+      fullPath: '/alerts'
+      preLoaderRoute: typeof AuthenticatedAlertsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/hooks/scrape': {
       id: '/api/public/hooks/scrape'
       path: '/api/public/hooks/scrape'
@@ -85,7 +245,29 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAlertsRoute: typeof AuthenticatedAlertsRoute
+  AuthenticatedMapRoute: typeof AuthenticatedMapRoute
+  AuthenticatedNewsRoute: typeof AuthenticatedNewsRoute
+  AuthenticatedSubscribeRoute: typeof AuthenticatedSubscribeRoute
+  AuthenticatedWardRoute: typeof AuthenticatedWardRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAlertsRoute: AuthenticatedAlertsRoute,
+  AuthenticatedMapRoute: AuthenticatedMapRoute,
+  AuthenticatedNewsRoute: AuthenticatedNewsRoute,
+  AuthenticatedSubscribeRoute: AuthenticatedSubscribeRoute,
+  AuthenticatedWardRoute: AuthenticatedWardRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   ApiAlertsRoute: ApiAlertsRoute,
   ApiUpvoteRoute: ApiUpvoteRoute,
   ApiPublicHooksScrapeRoute: ApiPublicHooksScrapeRoute,
@@ -93,3 +275,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
