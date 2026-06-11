@@ -7,6 +7,7 @@ import {
   normalizeTitle,
   jaccard,
   translateBatch,
+  classify,
   type ScrapedItem,
 } from "@/lib/scrape.server";
 
@@ -61,6 +62,7 @@ async function handleScrape() {
   let inserted = 0;
   let merged = 0;
   let skipped = 0;
+  let alertsInserted = 0;
 
   for (const it of all) {
     const enrich = it as ScrapedItem & { title_en?: string; summary_en?: string };
@@ -101,6 +103,7 @@ async function handleScrape() {
       continue;
     }
     // New article
+    const cls = classify(titleEn ?? it.title, it.title + " " + (it.summary ?? ""));
     const { data: ins, error } = await supabaseAdmin
       .from("news_articles")
       .insert({
@@ -113,7 +116,7 @@ async function handleScrape() {
         source_url: it.link,
         sources: [it.source],
         source_urls: [it.link],
-        category: "general",
+        category: cls.category,
         published_at: it.published_at,
         normalized_title: norm,
         is_duplicate: false,
@@ -123,6 +126,34 @@ async function handleScrape() {
     if (!error && ins) {
       inserted++;
       existingArr.push(ins as typeof existingArr[number]);
+
+      // Promote to alerts when it's actionable
+      if (cls.alert_type) {
+        // Dedupe against existing alerts by normalized title
+        const { data: dupAlert } = await supabaseAdmin
+          .from("alerts")
+          .select("id")
+          .ilike("title", (titleEn ?? it.title).slice(0, 60) + "%")
+          .limit(1)
+          .maybeSingle();
+        if (!dupAlert) {
+          const { error: aErr } = await supabaseAdmin.from("alerts").insert({
+            type: cls.alert_type,
+            category: cls.category,
+            title: titleEn ?? it.title,
+            title_ta: it.lang === "ta" ? it.title : null,
+            summary: summaryEn ?? it.summary ?? "",
+            summary_ta: it.lang === "ta" ? (it.summary ?? null) : null,
+            areas: cls.areas.length ? cls.areas : ["All wards"],
+            severity: cls.severity,
+            source: it.source,
+            source_url: it.link,
+            source_count: 1,
+            verified: false,
+          });
+          if (!aErr) alertsInserted++;
+        }
+      }
     }
   }
 
@@ -131,6 +162,7 @@ async function handleScrape() {
     elapsed_ms: Date.now() - t0,
     fetched: all.length,
     inserted,
+    alerts_inserted: alertsInserted,
     merged,
     skipped,
   });
