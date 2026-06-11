@@ -55,13 +55,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </header>
 
       <nav className="flex border-b border-border bg-card overflow-x-auto sticky top-[45px] z-20">
-        {tabs.map((t) => {
-          const active = path === t.to || path.startsWith(t.to + "/");
-          const Icon = t.icon;
+        {tabs.map((tab) => {
+          const active = path === tab.to || path.startsWith(tab.to + "/");
+          const Icon = tab.icon;
           return (
             <Link
-              key={t.to}
-              to={t.to}
+              key={tab.to}
+              to={tab.to}
               className={`flex items-center gap-1.5 px-3.5 py-2 text-[13px] whitespace-nowrap border-b-2 transition-colors ${
                 active
                   ? "text-primary border-primary font-medium"
@@ -69,7 +69,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
-              {useLangLabel(t.key)}
+              {t(tab.key)}
             </Link>
           );
         })}
@@ -82,9 +82,4 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </footer>
     </div>
   );
-}
-
-function useLangLabel(key: "alerts" | "news_feed" | "map" | "my_ward" | "subscribe") {
-  const { t } = useLang();
-  return t(key);
 }
