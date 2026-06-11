@@ -1,0 +1,15 @@
+UPDATE public.alerts SET title='Heavy rain alert for Coimbatore on Friday', title_ta='மழை எச்சரிக்கை: கோவையில் வெள்ளிக்கிழமை கனமழை' WHERE title LIKE 'மழை எச்சரிக்கை%';
+UPDATE public.alerts SET source_url='https://www.thehindu.com/news/cities/coimbatore/' WHERE source='The Hindu' AND source_url IS NULL;
+UPDATE public.alerts SET source_url='https://timesofindia.indiatimes.com/city/coimbatore' WHERE source='Times of India' AND source_url IS NULL;
+UPDATE public.alerts SET source_url='https://www.newindianexpress.com/cities/coimbatore' WHERE source='New Indian Express' AND source_url IS NULL;
+UPDATE public.alerts SET source_url='https://www.dinamalar.com/news_classify.asp?cat=2' WHERE source='Dinamalar' AND source_url IS NULL;
+UPDATE public.alerts SET source_url='https://www.dinamani.com/tamil-nadu/coimbatore' WHERE source='Dinamani' AND source_url IS NULL;
+UPDATE public.alerts SET source_url='https://www.dailythanthi.com/News/Tamilnadu/Coimbatore' WHERE source='Daily Thanthi' AND source_url IS NULL;
+UPDATE public.alerts SET source_url='https://www.tangedco.gov.in/' WHERE source='TANGEDCO' AND source_url IS NULL;
+UPDATE public.alerts SET source_url='https://www.ccmc.gov.in/' WHERE source LIKE 'CCMC%' AND source_url IS NULL;
+UPDATE public.alerts SET source_url='https://www.reddit.com/r/Coimbatore/' WHERE source='r/Coimbatore' AND source_url IS NULL;
+CREATE INDEX IF NOT EXISTS alerts_created_at_idx ON public.alerts (created_at DESC);
+CREATE INDEX IF NOT EXISTS alerts_upvotes_idx ON public.alerts (upvotes DESC);
+CREATE INDEX IF NOT EXISTS alerts_category_idx ON public.alerts (category);
+CREATE INDEX IF NOT EXISTS news_articles_published_at_idx ON public.news_articles (published_at DESC);
+CREATE INDEX IF NOT EXISTS news_articles_is_duplicate_idx ON public.news_articles (is_duplicate);
