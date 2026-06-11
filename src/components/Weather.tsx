@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Sun, CloudRain, Cloud, CloudSun, CloudSnow, CloudLightning, CloudFog } from "lucide-react";
+import { useLang } from "./LanguageContext";
 
 type WeatherData = {
   current: { temperature_2m: number; relative_humidity_2m: number; weather_code: number };
@@ -17,20 +18,35 @@ function iconFor(code: number) {
   if (code >= 95) return CloudLightning;
   return Cloud;
 }
-function describe(code: number): string {
-  if (code === 0) return "Clear sky";
-  if (code <= 2) return "Partly cloudy";
-  if (code === 3) return "Overcast";
-  if (code <= 48) return "Foggy";
-  if (code <= 57) return "Drizzle";
-  if (code <= 67) return "Rain";
-  if (code <= 77) return "Snow";
-  if (code <= 82) return "Rain showers";
-  if (code >= 95) return "Thunderstorm";
-  return "—";
+function describe(code: number, lang: "en" | "ta"): string {
+  const en = (
+    code === 0 ? "Clear sky" :
+    code <= 2 ? "Partly cloudy" :
+    code === 3 ? "Overcast" :
+    code <= 48 ? "Foggy" :
+    code <= 57 ? "Drizzle" :
+    code <= 67 ? "Rain" :
+    code <= 77 ? "Snow" :
+    code <= 82 ? "Rain showers" :
+    code >= 95 ? "Thunderstorm" : "—"
+  );
+  if (lang === "en") return en;
+  const map: Record<string, string> = {
+    "Clear sky": "தெளிவான வானம்",
+    "Partly cloudy": "ஓரளவு மேகமூட்டம்",
+    "Overcast": "முழு மேகமூட்டம்",
+    "Foggy": "மூடுபனி",
+    "Drizzle": "தூறல்",
+    "Rain": "மழை",
+    "Snow": "பனி",
+    "Rain showers": "மழைப்பொழிவு",
+    "Thunderstorm": "இடிமழை",
+  };
+  return map[en] ?? en;
 }
 
 export function Weather() {
+  const { lang, t } = useLang();
   const { data, isLoading } = useQuery<WeatherData>({
     queryKey: ["weather-coimbatore"],
     queryFn: async () => {
@@ -50,7 +66,7 @@ export function Weather() {
   if (isLoading || !data) {
     return (
       <div className="bg-secondary rounded-md p-2.5 text-center text-[11px] text-muted-foreground">
-        Loading weather…
+        {t("loading")}
       </div>
     );
   }
@@ -62,7 +78,7 @@ export function Weather() {
     <div className="bg-secondary rounded-md p-2.5 text-center">
       <Icon className="w-5 h-5 mx-auto text-warn mb-1" />
       <div className="text-[22px] font-medium">{Math.round(data.current.temperature_2m)}°C</div>
-      <div className="text-[11px] text-muted-foreground">{describe(data.current.weather_code)}</div>
+      <div className="text-[11px] text-muted-foreground">{describe(data.current.weather_code, lang)}</div>
       <div className="flex justify-between text-[11px] text-muted-foreground mt-2">
         <span>H: {high}°</span>
         <span>L: {low}°</span>
@@ -70,7 +86,7 @@ export function Weather() {
       </div>
       {pop >= 40 && (
         <div className="flex items-center justify-center gap-1 text-[11px] text-cat-weather-fg mt-2">
-          <CloudRain className="w-3 h-3" /> Rain likely ({pop}%)
+          <CloudRain className="w-3 h-3" /> {lang === "ta" ? `மழை வாய்ப்பு (${pop}%)` : `Rain likely (${pop}%)`}
         </div>
       )}
     </div>

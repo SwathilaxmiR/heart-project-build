@@ -135,6 +135,54 @@ export function jaccard(a: string, b: string): number {
   return inter / union;
 }
 
+// --- Keyword classification (cheap, deterministic) ---
+// Maps an item to { category, alert_type, severity, areas }. Returns null when
+// it's general news that should not be promoted to an alert.
+const TYPE_RULES: { type: string; cat: string; words: string[] }[] = [
+  { type: "power_cut", cat: "civic",   words: ["power cut", "power outage", "shutdown", "load shedding", "tangedco", "மின் தடை", "மின்வெட்டு", "மின்தடை"] },
+  { type: "water_cut", cat: "civic",   words: ["water cut", "water supply", "pipeline", "no water", "குடிநீர் தடை", "தண்ணீர் தடை"] },
+  { type: "road_work", cat: "traffic", words: ["road work", "pothole", "road closure", "diversion", "flyover", "சாலை பழுது", "சாலை மூடல்"] },
+  { type: "flooding",  cat: "civic",   words: ["flood", "waterlogging", "inundation", "வெள்ளம்", "தண்ணீர் தேங்கல்"] },
+  { type: "traffic",   cat: "traffic", words: ["traffic jam", "congestion", "accident", "blocked", "போக்குவரத்து", "விபத்து"] },
+  { type: "weather",   cat: "weather", words: ["rain", "thunderstorm", "cyclone", "heatwave", "imd", "மழை", "புயல்", "வெப்ப அலை"] },
+  { type: "crime",     cat: "crime",   words: ["arrested", "murder", "robbery", "theft", "police", "fraud", "கைது", "கொலை", "திருட்டு", "மோசடி"] },
+  { type: "health",    cat: "health",  words: ["dengue", "covid", "outbreak", "hospital", "fever", "டெங்கு", "காய்ச்சல்"] },
+  { type: "civic",     cat: "civic",   words: ["ccmc", "corporation", "mayor", "ward", "mla", "மாநகராட்சி", "வார்டு"] },
+  { type: "other",     cat: "politics",words: ["election", "dmk", "aiadmk", "bjp", "minister", "தேர்தல்", "அமைச்சர்"] },
+];
+
+const WARD_KEYWORDS = [
+  "RS Puram","Peelamedu","Singanallur","Gandhipuram","Saibaba Colony","Ramanathapuram",
+  "Ukkadam","Podanur","Ganapathy","Vadavalli","Ondipudur","Brookefields","Saravanampatti",
+  "Trichy Road","Avinashi Road","Hopes College","Selvapuram","Kuniyamuthur","Lanka Corner",
+];
+
+export type Classified = {
+  category: string;
+  alert_type: string | null;     // null => not an alert, news only
+  severity: "low" | "medium" | "high" | "breaking";
+  areas: string[];
+};
+
+export function classify(textEn: string, textOrig: string): Classified {
+  const blob = (textEn + " " + textOrig).toLowerCase();
+  let matched: typeof TYPE_RULES[number] | null = null;
+  for (const rule of TYPE_RULES) {
+    if (rule.words.some((w) => blob.includes(w.toLowerCase()))) { matched = rule; break; }
+  }
+  const areas = WARD_KEYWORDS.filter((w) => blob.includes(w.toLowerCase()));
+  let severity: Classified["severity"] = "low";
+  if (/breaking|urgent|emergency|red alert|severe/.test(blob)) severity = "breaking";
+  else if (/heavy|major|widespread|warning/.test(blob)) severity = "high";
+  else if (matched) severity = "medium";
+  return {
+    category: matched?.cat ?? "general",
+    alert_type: matched && matched.type !== "other" ? matched.type : null,
+    severity,
+    areas,
+  };
+}
+
 // --- Translation via Lovable AI (Gemini) ---
 export async function translateBatch(texts: string[]): Promise<string[]> {
   const key = process.env.LOVABLE_API_KEY;

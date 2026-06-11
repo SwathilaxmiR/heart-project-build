@@ -9,33 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WardRouteImport } from './routes/ward'
-import { Route as SubscribeRouteImport } from './routes/subscribe'
-import { Route as NewsRouteImport } from './routes/news'
-import { Route as MapRouteImport } from './routes/map'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiUpvoteRouteImport } from './routes/api/upvote'
 import { Route as ApiAlertsRouteImport } from './routes/api/alerts'
+import { Route as AuthenticatedWardRouteImport } from './routes/_authenticated/ward'
+import { Route as AuthenticatedSubscribeRouteImport } from './routes/_authenticated/subscribe'
+import { Route as AuthenticatedNewsRouteImport } from './routes/_authenticated/news'
+import { Route as AuthenticatedMapRouteImport } from './routes/_authenticated/map'
+import { Route as AuthenticatedAlertsRouteImport } from './routes/_authenticated/alerts'
 import { Route as ApiPublicHooksScrapeRouteImport } from './routes/api/public/hooks/scrape'
 
-const WardRoute = WardRouteImport.update({
-  id: '/ward',
-  path: '/ward',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SubscribeRoute = SubscribeRouteImport.update({
-  id: '/subscribe',
-  path: '/subscribe',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NewsRoute = NewsRouteImport.update({
-  id: '/news',
-  path: '/news',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MapRoute = MapRouteImport.update({
-  id: '/map',
-  path: '/map',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -53,6 +45,31 @@ const ApiAlertsRoute = ApiAlertsRouteImport.update({
   path: '/api/alerts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedWardRoute = AuthenticatedWardRouteImport.update({
+  id: '/ward',
+  path: '/ward',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSubscribeRoute = AuthenticatedSubscribeRouteImport.update({
+  id: '/subscribe',
+  path: '/subscribe',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedNewsRoute = AuthenticatedNewsRouteImport.update({
+  id: '/news',
+  path: '/news',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMapRoute = AuthenticatedMapRouteImport.update({
+  id: '/map',
+  path: '/map',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAlertsRoute = AuthenticatedAlertsRouteImport.update({
+  id: '/alerts',
+  path: '/alerts',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ApiPublicHooksScrapeRoute = ApiPublicHooksScrapeRouteImport.update({
   id: '/api/public/hooks/scrape',
   path: '/api/public/hooks/scrape',
@@ -61,20 +78,24 @@ const ApiPublicHooksScrapeRoute = ApiPublicHooksScrapeRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/map': typeof MapRoute
-  '/news': typeof NewsRoute
-  '/subscribe': typeof SubscribeRoute
-  '/ward': typeof WardRoute
+  '/auth': typeof AuthRoute
+  '/alerts': typeof AuthenticatedAlertsRoute
+  '/map': typeof AuthenticatedMapRoute
+  '/news': typeof AuthenticatedNewsRoute
+  '/subscribe': typeof AuthenticatedSubscribeRoute
+  '/ward': typeof AuthenticatedWardRoute
   '/api/alerts': typeof ApiAlertsRoute
   '/api/upvote': typeof ApiUpvoteRoute
   '/api/public/hooks/scrape': typeof ApiPublicHooksScrapeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/map': typeof MapRoute
-  '/news': typeof NewsRoute
-  '/subscribe': typeof SubscribeRoute
-  '/ward': typeof WardRoute
+  '/auth': typeof AuthRoute
+  '/alerts': typeof AuthenticatedAlertsRoute
+  '/map': typeof AuthenticatedMapRoute
+  '/news': typeof AuthenticatedNewsRoute
+  '/subscribe': typeof AuthenticatedSubscribeRoute
+  '/ward': typeof AuthenticatedWardRoute
   '/api/alerts': typeof ApiAlertsRoute
   '/api/upvote': typeof ApiUpvoteRoute
   '/api/public/hooks/scrape': typeof ApiPublicHooksScrapeRoute
@@ -82,10 +103,13 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/map': typeof MapRoute
-  '/news': typeof NewsRoute
-  '/subscribe': typeof SubscribeRoute
-  '/ward': typeof WardRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/alerts': typeof AuthenticatedAlertsRoute
+  '/_authenticated/map': typeof AuthenticatedMapRoute
+  '/_authenticated/news': typeof AuthenticatedNewsRoute
+  '/_authenticated/subscribe': typeof AuthenticatedSubscribeRoute
+  '/_authenticated/ward': typeof AuthenticatedWardRoute
   '/api/alerts': typeof ApiAlertsRoute
   '/api/upvote': typeof ApiUpvoteRoute
   '/api/public/hooks/scrape': typeof ApiPublicHooksScrapeRoute
@@ -94,6 +118,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
+    | '/alerts'
     | '/map'
     | '/news'
     | '/subscribe'
@@ -104,6 +130,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
+    | '/alerts'
     | '/map'
     | '/news'
     | '/subscribe'
@@ -114,10 +142,13 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/map'
-    | '/news'
-    | '/subscribe'
-    | '/ward'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/alerts'
+    | '/_authenticated/map'
+    | '/_authenticated/news'
+    | '/_authenticated/subscribe'
+    | '/_authenticated/ward'
     | '/api/alerts'
     | '/api/upvote'
     | '/api/public/hooks/scrape'
@@ -125,10 +156,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  MapRoute: typeof MapRoute
-  NewsRoute: typeof NewsRoute
-  SubscribeRoute: typeof SubscribeRoute
-  WardRoute: typeof WardRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   ApiAlertsRoute: typeof ApiAlertsRoute
   ApiUpvoteRoute: typeof ApiUpvoteRoute
   ApiPublicHooksScrapeRoute: typeof ApiPublicHooksScrapeRoute
@@ -136,32 +165,18 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/ward': {
-      id: '/ward'
-      path: '/ward'
-      fullPath: '/ward'
-      preLoaderRoute: typeof WardRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/subscribe': {
-      id: '/subscribe'
-      path: '/subscribe'
-      fullPath: '/subscribe'
-      preLoaderRoute: typeof SubscribeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/news': {
-      id: '/news'
-      path: '/news'
-      fullPath: '/news'
-      preLoaderRoute: typeof NewsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/map': {
-      id: '/map'
-      path: '/map'
-      fullPath: '/map'
-      preLoaderRoute: typeof MapRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -185,6 +200,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAlertsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/ward': {
+      id: '/_authenticated/ward'
+      path: '/ward'
+      fullPath: '/ward'
+      preLoaderRoute: typeof AuthenticatedWardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/subscribe': {
+      id: '/_authenticated/subscribe'
+      path: '/subscribe'
+      fullPath: '/subscribe'
+      preLoaderRoute: typeof AuthenticatedSubscribeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/news': {
+      id: '/_authenticated/news'
+      path: '/news'
+      fullPath: '/news'
+      preLoaderRoute: typeof AuthenticatedNewsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/map': {
+      id: '/_authenticated/map'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof AuthenticatedMapRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/alerts': {
+      id: '/_authenticated/alerts'
+      path: '/alerts'
+      fullPath: '/alerts'
+      preLoaderRoute: typeof AuthenticatedAlertsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/hooks/scrape': {
       id: '/api/public/hooks/scrape'
       path: '/api/public/hooks/scrape'
@@ -195,12 +245,29 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAlertsRoute: typeof AuthenticatedAlertsRoute
+  AuthenticatedMapRoute: typeof AuthenticatedMapRoute
+  AuthenticatedNewsRoute: typeof AuthenticatedNewsRoute
+  AuthenticatedSubscribeRoute: typeof AuthenticatedSubscribeRoute
+  AuthenticatedWardRoute: typeof AuthenticatedWardRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAlertsRoute: AuthenticatedAlertsRoute,
+  AuthenticatedMapRoute: AuthenticatedMapRoute,
+  AuthenticatedNewsRoute: AuthenticatedNewsRoute,
+  AuthenticatedSubscribeRoute: AuthenticatedSubscribeRoute,
+  AuthenticatedWardRoute: AuthenticatedWardRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  MapRoute: MapRoute,
-  NewsRoute: NewsRoute,
-  SubscribeRoute: SubscribeRoute,
-  WardRoute: WardRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   ApiAlertsRoute: ApiAlertsRoute,
   ApiUpvoteRoute: ApiUpvoteRoute,
   ApiPublicHooksScrapeRoute: ApiPublicHooksScrapeRoute,
